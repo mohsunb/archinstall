@@ -7,7 +7,7 @@ printf "Disk: '$BLOCK_DEVICE\n'"
 printf "Enter 'Confirm' to continue: "
 read CONTINUE
 
-if [[ $CONTINUE != "Continue" ]]; then
+if [[ $CONTINUE != "Confirm" ]]; then
 	printf "Aborting...\n"
 	exit 1
 fi
