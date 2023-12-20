@@ -2,13 +2,13 @@
 
 printf "Enter disk name: "
 read BLOCK_DEVICE
-printf "Disk: '$BLOCK_DEVICE\n'"
+printf "Disk: '$BLOCK_DEVICE'\n"
 
 printf "Enter 'Confirm' to continue: "
 read CONTINUE
 
 if [[ $CONTINUE != "Confirm" ]]; then
-	printf "Aborting...\n"
+	printf "Not confirmed. Aborting...\n"
 	exit 1
 fi
 
@@ -26,6 +26,8 @@ printf "g\nn\n\n\n+1G\nt\n1\nn\n\n\n\nw\n" | fdisk $BLOCK_DEVICE
 mkfs.fat -F32 ${BLOCK_SUB}1
 mkfs.btrfs -f ${BLOCK_SUB}2 -L Arch\ Linux
 
+printf "Updating pacman servers list...\n"
+printf "Done.\n
 systemctl start reflector.service
 
 sed -i '/#Color/s/^#//' /etc/pacman.conf
