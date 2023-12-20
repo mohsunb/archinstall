@@ -67,7 +67,7 @@ mount -o subvol=@home /dev/mapper/root /mnt/home
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
 
-pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode
+pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -79,5 +79,13 @@ sed -i '/#en_US/s/^#//' /mnt/etc/locale.gen
 arch-chroot /mnt locale-gen
 
 printf $HOSTNAME >> /mnt/etc/hostname
-printf "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t${HOSTNAME}.localdomain\t${HOSTNAME}" >> /mnt/etc/hosts
+printf "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t${HOSTNAME}.localdomain\t${HOSTNAME}\n" >> /mnt/etc/hosts
+
+printf "LANG=\"en_US.UTF-8\"\nLC_TIME=\"en_GB.UTF-8\"\n" >> /mnt/etc/locale.conf
+printf "KEYMAP=us\n" >> /mnt/etc/vconsole.conf
+
+sed -i '/^HOOKS/s/\budev\b/systemd/' /mnt/etc/mkinitcpio.conf
+sed -i '/^HOOKS/s/\bkeymap\sconsolefont/sd-vconsole/' /mnt/etc/mkinitcpio.conf
+sed -i '/^HOOKS/s/\bblock\b/block sd-encrypt/' /mnt/etc/mkinitcpio.conf
+arch-chroot /mnt mkinitcpio -P
 
