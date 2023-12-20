@@ -1,5 +1,7 @@
 #!/usr/bin/zsh
 
+OMZ_INSTALL="sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
+
 printf "Enter disk name: "
 read BLOCK_DEVICE
 printf "Disk: '$BLOCK_DEVICE'\n"
@@ -67,7 +69,7 @@ mount -o subvol=@home /dev/mapper/root /mnt/home
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
 
-pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas networkmanager bluez bluez-utils reflector pacman-contrib
+pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas networkmanager bluez bluez-utils reflector pacman-contrib sbctl
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
