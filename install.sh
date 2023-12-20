@@ -84,12 +84,16 @@ mkfs.btrfs /dev/mapper/root -L Arch\ Linux
 
 mount /dev/mapper/root /mnt
 btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@home_snapshots
 btrfs subvolume create /mnt/@var_log
 umount /mnt
 mount -o subvol=@ /dev/mapper/root /mnt
-mkdir -p /mnt/boot /mnt/home /mnt/var/log
+mkdir -p /mnt/boot /mnt/.snapshots /mnt/home/.snapshots /mnt/var/log
+mount -o subvol=@snapshots /dev/mapper/root /mnt/.snapshots
 mount -o subvol=@home /dev/mapper/root /mnt/home
+mount -o subvol=@home_snapshots /dev/mapper/root /mnt/home/.snapshots
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
 
@@ -99,9 +103,9 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt ln -s /usr/share/zoneinfo/Asia/Baku /etc/localtime
 
-sed -i '/#az_AZ/s/^#//' /mnt/etc/locale.gen
-sed -i '0,/#en_GB/s/^#//' /mnt/etc/locale.gen
-sed -i '0,/#en_US/s/^#//' /mnt/etc/locale.gen
+sed -i '/#az_AZ.UTF-8/s/^#//' /mnt/etc/locale.gen
+sed -i '/#en_GB.UTF-8/s/^#//' /mnt/etc/locale.gen
+sed -i '/#en_US.UTF-8/s/^#//' /mnt/etc/locale.gen
 arch-chroot /mnt locale-gen
 
 printf $HOSTNAME >> /mnt/etc/hostname
@@ -134,14 +138,16 @@ arch-chroot /mnt bootctl install
 printf "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/amd-ucode.img\ninitrd\t/initramfs-linux.img\noptions\trd.luks.name=$ROOTP_UUID=root root=/dev/mapper/root rootflags=subvol=@ rw asus_wmi.fnlock_default=0 zswap.enabled=0 quiet loglevel=3 splash\n" >> /mnt/boot/loader/entries/arch.conf
 printf "default arch.conf\neditor no\nconsole-mode max\ntimeout 0\n" >> /mnt/boot/loader/loader.conf
 
-arch-chroot /mnt systemctl enable NetworkManager bluetooth sddm power-profiles-daemon fstrim.timer paccache.timer
+git clone https://github.com/mohsunb/linux-config.git
+mv ./linux-config/etc/* /mnt/etc
 
-printf "${LUKS_P2}\n" | systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 $ROOTP
+arch-chroot /mnt systemctl enable NetworkManager bluetooth sddm power-profiles-daemon fstrim.timer paccache.timer systemd-boot-update snapper-timeline.timer snapper-cleanup.timer snapper-boot.timer
 
 umount /mnt/var/log
+umount /mnt/home/.snapshots
 umount /mnt/home
+umount /mnt/.snapshots
 umount /mnt/boot
 umount /mnt
 cryptsetup luksClose root
-
 
