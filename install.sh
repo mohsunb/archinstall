@@ -143,6 +143,8 @@ mv ./linux-config/etc/* /mnt/etc
 
 arch-chroot /mnt systemctl enable NetworkManager bluetooth sddm power-profiles-daemon fstrim.timer paccache.timer systemd-boot-update snapper-timeline.timer snapper-cleanup.timer snapper-boot.timer
 
+sed -i '/Parallel/s/\b[0-9]\{1,\}$/5/' /mnt/etc/pacman.conf
+
 umount /mnt/var/log
 umount /mnt/home/.snapshots
 umount /mnt/home
@@ -150,4 +152,3 @@ umount /mnt/.snapshots
 umount /mnt/boot
 umount /mnt
 cryptsetup luksClose root
-
