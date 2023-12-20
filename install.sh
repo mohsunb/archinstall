@@ -67,15 +67,15 @@ mount -o subvol=@home /dev/mapper/root /mnt/home
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
 
-pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas
+pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas networkmanager bluez bluez-utils reflector pacman-contrib
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt ln -s /usr/share/zoneinfo/Asia/Baku /etc/localtime
 
 sed -i '/#az_AZ/s/^#//' /mnt/etc/locale.gen
-sed -i '/#en_GB/s/^#//' /mnt/etc/locale.gen
-sed -i '/#en_US/s/^#//' /mnt/etc/locale.gen
+sed -i '0,/#en_GB/s/^#//' /mnt/etc/locale.gen
+sed -i '0,/#en_US/s/^#//' /mnt/etc/locale.gen
 arch-chroot /mnt locale-gen
 
 printf $HOSTNAME >> /mnt/etc/hostname
