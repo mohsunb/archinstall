@@ -3,10 +3,10 @@
 OMZ_INSTALL="sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
 
 printf "Enter username: "
-read USERNAME
-printf "\nUsername: '$USERNAME'\n"
+read NEW_USERNAME
+printf "\nUsername: '$NEW_USERNAME'"
 
-printf "Enter root password: "
+printf "\nEnter root password: "
 read -s ROOT_P1
 printf "\n(Confirm) Enter root password: "
 read -s ROOT_P2
@@ -16,9 +16,9 @@ if [[ $ROOT_P1 != $ROOT_P2 ]]; then
 	exit 1
 fi
 
-printf "Enter password for '$USERNAME': "
+printf "\nEnter password for '$NEW_USERNAME': "
 read -s USER_P1
-printf "\n(Confirm) Enter password for '$USERNAME': "
+printf "\n(Confirm) Enter password for '$NEW_USERNAME': "
 read -s USER_P2
 
 if [[ $USER_P1 != $USER_P2 ]]; then
@@ -26,11 +26,11 @@ if [[ $USER_P1 != $USER_P2 ]]; then
 	exit 1
 fi
 
-printf "Enter disk name: "
+printf "\nEnter disk name: "
 read BLOCK_DEVICE
-printf "Disk: '$BLOCK_DEVICE'\n"
+printf "\nDisk: '$BLOCK_DEVICE'"
 
-printf "Enter LUKS passphrase: "
+printf "\nEnter LUKS passphrase: "
 read -s LUKS_P1
 printf "\n(Confirm) Enter LUKS passphrase: "
 read -s LUKS_P2
@@ -120,9 +120,9 @@ sed -i '/^HOOKS/s/\bblock\b/block sd-encrypt/' /mnt/etc/mkinitcpio.conf
 arch-chroot /mnt mkinitcpio -P
 
 printf "${ROOT_P2}\n${ROOT_P2}\n" | arch-chroot /mnt passwd
-arch-chroot /mnt useradd -m $USERNAME
-printf "${USER_P2}\n${USER_P2}\n" | arch-chroot /mnt passwd $USERNAME
-arch-chroot /mnt usermod -aG wheel,audio,video,optical,storage $USERNAME
+arch-chroot /mnt useradd -m $NEW_USERNAME
+printf "${USER_P2}\n${USER_P2}\n" | arch-chroot /mnt passwd $NEW_USERNAME
+arch-chroot /mnt usermod -aG wheel,audio,video,optical,storage $NEW_USERNAME
 
 arch-chroot /mnt sbctl create-keys
 arch-chroot /mnt sbctl enroll-keys -m
@@ -143,5 +143,4 @@ umount /mnt/home
 umount /mnt/boot
 umount /mnt
 cryptsetup luksClose root
-poweroff
 
