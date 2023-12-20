@@ -27,7 +27,7 @@ mkfs.fat -F32 ${BLOCK_SUB}1
 mkfs.btrfs -f ${BLOCK_SUB}2 -L Arch\ Linux
 
 printf "Updating pacman servers list...\n"
-printf "Done.\n
+printf "Done.\n"
 systemctl start reflector.service
 
 sed -i '/#Color/s/^#//' /etc/pacman.conf
