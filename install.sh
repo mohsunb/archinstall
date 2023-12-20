@@ -14,6 +14,10 @@ if [[ $LUKS_P1 != $LUKS_P2 ]]; then
 	exit 1
 fi
 
+printf "\nEnter hostname: "
+read HOSTNAME
+printf "\nHostname: '$HOSTNAME'"
+
 printf "\nEnter 'Confirm' to continue: "
 read CONTINUE
 
