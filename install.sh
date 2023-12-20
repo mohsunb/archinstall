@@ -52,14 +52,16 @@ cryptsetup luksFormat --batch-mode $ROOTP <<< $LUKS_P2
 cryptsetup luksOpen $ROOTP root <<< $LUKS_P2
 mkfs.btrfs /dev/mapper/root -L Arch\ Linux
 
-mount $ROOTP /mnt
+mount /dev/mapper/root /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var_log
 umount /mnt
-mount -o subvol=@ $ROOTP /mnt
+mount -o subvol=@ /dev/mapper/root /mnt
 mkdir -p /mnt/boot /mnt/home /mnt/var/log
-mount -o subvol=@home $ROOTP /mnt/home
-mount -o subvol=@var_log $ROOTP /mnt/var/log
+mount -o subvol=@home /dev/mapper/root /mnt/home
+mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
+
+pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland
 
