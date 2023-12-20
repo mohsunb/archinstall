@@ -2,6 +2,30 @@
 
 OMZ_INSTALL="sh -c \"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
 
+printf "Enter username: "
+read USERNAME
+printf "\nUsername: '$USERNAME'\n"
+
+printf "Enter root password: "
+read -s ROOT_P1
+printf "\n(Confirm) Enter root password: "
+read -s ROOT_P2
+
+if [[ $ROOT_P1 != $ROOT_P2 ]]; then
+	printf "\nRoot passwords do not match. Aborting...\n"
+	exit 1
+fi
+
+printf "Enter password for '$USERNAME': "
+read -s USER_P1
+printf "\n(Confirm) Enter password for '$USERNAME': "
+read -s USER_P2
+
+if [[ $USER_P1 != $USER_P2 ]]; then
+	printf "\nUser passwords do not match. Aborting...\n"
+	exit 1
+fi
+
 printf "Enter disk name: "
 read BLOCK_DEVICE
 printf "Disk: '$BLOCK_DEVICE'\n"
@@ -69,7 +93,7 @@ mount -o subvol=@home /dev/mapper/root /mnt/home
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
 
-pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas networkmanager bluez bluez-utils reflector pacman-contrib sbctl
+pacstrap -P /mnt base linux linux-firmware linux-headers plasma plasma-wayland-session firefox dolphin ark ffmpegthumbs git vim gwenview mpv libva-mesa-driver vulkan-radeon lib32-mesa lib32-libva-mesa-driver lib32-vulkan-radeon noto-fonts noto-fonts-cjk ttf-roboto ttf-jetbrains-mono-nerd zsh starship alacritty btrfs-progs snapper htop radeontop kate kamoso qt6-wayland amd-ucode base-devel opendoas networkmanager bluez bluez-utils reflector pacman-contrib sbctl power-profiles-daemon
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -94,4 +118,30 @@ sed -i '/^HOOKS/s/\budev\b/systemd/' /mnt/etc/mkinitcpio.conf
 sed -i '/^HOOKS/s/\bkeymap\sconsolefont/sd-vconsole/' /mnt/etc/mkinitcpio.conf
 sed -i '/^HOOKS/s/\bblock\b/block sd-encrypt/' /mnt/etc/mkinitcpio.conf
 arch-chroot /mnt mkinitcpio -P
+
+printf "${ROOT_P2}\n${ROOT_P2}\n" | arch-chroot /mnt passwd
+arch-chroot /mnt useradd -m $USERNAME
+printf "${USER_P2}\n${USER_P2}\n" | arch-chroot /mnt passwd $USERNAME
+arch-chroot /mnt usermod -aG wheel,audio,video,optical,storage $USERNAME
+
+arch-chroot /mnt sbctl create-keys
+arch-chroot /mnt sbctl enroll-keys -m
+arch-chroot /mnt sbctl sign -s -o /mnt/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /mnt/usr/lib/systemd/boot/efi/systemd-bootx64.efi
+arch-chroot /mnt sbctl sign -s /mnt/boot/vmlinuz-linux
+
+ROOTP_UUID=$(ls -l /dev/disk/by-uuid | grep ${ROOTP:4} | grep -o -E "[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")
+arch-chroot /mnt bootctl install
+printf "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/amd-ucode.img\ninitrd\t/initramfs-linux.img\noptions\trd.luks.name=$ROOTP_UUID=root root=/dev/mapper/root rootflags=subvol=@ rw asus_wmi.fnlock_default=0 zswap.enabled=0 quiet loglevel=3 splash\n" >> /mnt/boot/loader/entries/arch.conf
+printf "default arch.conf\neditor no\nconsole-mode max\ntimeout 0\n" >> /mnt/boot/loader/loader.conf
+
+arch-chroot /mnt systemctl enable NetworkManager bluetooth sddm power-profiles-daemon fstrim.timer paccache.timer
+
+printf "${LUKS_P2}\n" | arch-chroot /mnt systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 $ROOTP
+
+umount /mnt/var/log
+umount /mnt/home
+umount /mnt/boot
+umount /mnt
+cryptsetup luksClose root
+poweroff
 
