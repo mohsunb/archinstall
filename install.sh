@@ -49,7 +49,7 @@ sed -i '/#\[multilib\]/s/^#//' /etc/pacman.conf
 sed -i '/\[multilib\]/{n;s/^#//;}' /etc/pacman.conf
 
 cryptsetup luksFormat --batch-mode $ROOTP <<< $LUKS_P2
-cryptsetup open $ROOTP root <<< $LUKS_P2
+cryptsetup luksOpen $ROOTP root <<< $LUKS_P2
 mkfs.btrfs /dev/mapper/root -L Arch\ Linux
 
 mount $ROOTP /mnt
