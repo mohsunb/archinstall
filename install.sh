@@ -136,7 +136,7 @@ printf "default arch.conf\neditor no\nconsole-mode max\ntimeout 0\n" >> /mnt/boo
 echo "bootloader done"
 arch-chroot /mnt systemctl enable NetworkManager bluetooth sddm power-profiles-daemon fstrim.timer paccache.timer
 echo "services enabled"
-printf "${LUKS_P2}\n" | arch-chroot /mnt systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 $ROOTP
+printf "${LUKS_P2}\n" | systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 $ROOTP
 echo "tpm done"
 umount /mnt/var/log
 umount /mnt/home
