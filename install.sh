@@ -84,6 +84,10 @@ printf "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t${HOSTNAME}.localdoma
 printf "LANG=\"en_US.UTF-8\"\nLC_TIME=\"en_GB.UTF-8\"\n" >> /mnt/etc/locale.conf
 printf "KEYMAP=us\n" >> /mnt/etc/vconsole.conf
 
+sed -i '0,/#\s%wheel/s/^#\s//' /mnt/etc/sudoers
+printf "permit persist :wheel\n" >> /mnt/etc/doas.conf
+chmod -c 0400 /mnt/etc/doas.conf
+
 sed -i '/^HOOKS/s/\budev\b/systemd/' /mnt/etc/mkinitcpio.conf
 sed -i '/^HOOKS/s/\bkeymap\sconsolefont/sd-vconsole/' /mnt/etc/mkinitcpio.conf
 sed -i '/^HOOKS/s/\bblock\b/block sd-encrypt/' /mnt/etc/mkinitcpio.conf
