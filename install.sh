@@ -126,8 +126,8 @@ arch-chroot /mnt usermod -aG wheel,audio,video,optical,storage $NEW_USERNAME
 echo "users done"
 arch-chroot /mnt sbctl create-keys
 arch-chroot /mnt sbctl enroll-keys -m
-arch-chroot /mnt sbctl sign -s -o /mnt/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /mnt/usr/lib/systemd/boot/efi/systemd-bootx64.efi
-arch-chroot /mnt sbctl sign -s /mnt/boot/vmlinuz-linux
+arch-chroot /mnt sbctl sign -s -o /usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed /usr/lib/systemd/boot/efi/systemd-bootx64.efi
+arch-chroot /mnt sbctl sign -s /boot/vmlinuz-linux
 echo "secure boot done"
 ROOTP_UUID=$(ls -l /dev/disk/by-uuid | grep ${ROOTP:4} | grep -o -E "[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")
 arch-chroot /mnt bootctl install
