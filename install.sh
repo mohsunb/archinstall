@@ -90,9 +90,10 @@ btrfs subvolume create /mnt/@home_snapshots
 btrfs subvolume create /mnt/@var_log
 umount /mnt
 mount -o subvol=@ /dev/mapper/root /mnt
-mkdir -p /mnt/boot /mnt/.snapshots /mnt/home/.snapshots /mnt/var/log
+mkdir -p /mnt/boot /mnt/.snapshots /mnt/home /mnt/var/log
 mount -o subvol=@snapshots /dev/mapper/root /mnt/.snapshots
 mount -o subvol=@home /dev/mapper/root /mnt/home
+mkdir /mnt/home/.snapshots
 mount -o subvol=@home_snapshots /dev/mapper/root /mnt/home/.snapshots
 mount -o subvol=@var_log /dev/mapper/root /mnt/var/log
 mount $ESP /mnt/boot
